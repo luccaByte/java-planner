@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lucca.planner.participant.ParticipantCreateResponse;
+import com.lucca.planner.participant.ParticipantData;
 import com.lucca.planner.participant.ParticipantRequestPayload;
 import com.lucca.planner.participant.ParticipantService;
 
@@ -38,6 +40,13 @@ public class TripController {
         this.participantService.registerParticipantsToEvent(payload.emails_to_invite(), newTrip);
 
         return ResponseEntity.ok(new TripCreateResponse(newTrip.getId()));
+    }
+
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<List<ParticipantData>> getAllParticipants(@PathVariable UUID id) {
+        List<ParticipantData> participantList = this.participantService.getAllParticipantsFromEvent(id);
+
+        return ResponseEntity.ok(participantList);
     }
 
     @GetMapping("/{id}")
@@ -102,4 +111,7 @@ public class TripController {
 
         return ResponseEntity.notFound().build();
     }
+
+    
+
 }
