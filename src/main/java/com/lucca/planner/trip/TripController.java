@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lucca.planner.activity.ActivityRequestPayload;
+import com.lucca.planner.activity.ActivityResponse;
+import com.lucca.planner.activity.ActivityService;
 import com.lucca.planner.participant.ParticipantCreateResponse;
 import com.lucca.planner.participant.ParticipantData;
 import com.lucca.planner.participant.ParticipantRequestPayload;
@@ -30,7 +33,11 @@ public class TripController {
     private ParticipantService participantService;
 
     @Autowired
+    private ActivityService activityService;
+
+    @Autowired
     private TripRepository repository;
+
 
     @PostMapping
     public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
@@ -112,6 +119,20 @@ public class TripController {
         return ResponseEntity.notFound().build();
     }
 
-    
+    @PostMapping("/{id}/activities")
+    public ResponseEntity<ActivityResponse> registerActivity(@PathVariable UUID id, @RequestBody ActivityRequestPayload payload) {
+
+        Optional<Trip> trip = this.repository.findById(id);
+
+        if(trip.isPresent()){
+            Trip rawTrip = trip.get();
+
+            ActivityResponse activityResponse = this.activityService.registerActivity(payload, rawTrip);
+
+            return ResponseEntity.ok(activityResponse);
+        }
+        return ResponseEntity.notFound().build();
+
+    }
 
 }
