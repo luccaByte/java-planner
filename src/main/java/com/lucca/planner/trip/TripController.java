@@ -39,7 +39,6 @@ public class TripController {
     @Autowired
     private TripRepository repository;
 
-
     @PostMapping
     public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
         Trip newTrip = new Trip(payload);
@@ -48,13 +47,6 @@ public class TripController {
         this.participantService.registerParticipantsToEvent(payload.emails_to_invite(), newTrip);
 
         return ResponseEntity.ok(new TripCreateResponse(newTrip.getId()));
-    }
-
-    @GetMapping("/{id}/participants")
-    public ResponseEntity<List<ParticipantData>> getAllParticipants(@PathVariable UUID id) {
-        List<ParticipantData> participantList = this.participantService.getAllParticipantsFromEvent(id);
-
-        return ResponseEntity.ok(participantList);
     }
 
     @GetMapping("/{id}")
@@ -102,24 +94,7 @@ public class TripController {
 
         return ResponseEntity.notFound().build();
     }
-
-    @PostMapping("/{id}/invite")
-    public ResponseEntity<ParticipantCreateResponse> inviteParticipant(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload) {
-        Optional<Trip> trip = this.repository.findById(id);
-
-        if(trip.isPresent()){
-            Trip rawTrip = trip.get();
-
-            ParticipantCreateResponse participantResponse  = this.participantService.registerParticipantToEvent(payload.email(), rawTrip);
-
-            if(rawTrip.getIsConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(payload.email());
-            
-            return ResponseEntity.ok(participantResponse);
-        }
-
-        return ResponseEntity.notFound().build();
-    }
-
+ 
     @PostMapping("/{id}/activities")
     public ResponseEntity<ActivityResponse> registerActivity(@PathVariable UUID id, @RequestBody ActivityRequestPayload payload) {
 
@@ -142,5 +117,30 @@ public class TripController {
 
         return ResponseEntity.ok(activityDataList);
     }
+
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<List<ParticipantData>> getAllParticipants(@PathVariable UUID id) {
+        List<ParticipantData> participantList = this.participantService.getAllParticipantsFromEvent(id);
+
+        return ResponseEntity.ok(participantList);
+    }
+
+    @PostMapping("/{id}/invite")
+    public ResponseEntity<ParticipantCreateResponse> inviteParticipant(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload) {
+        Optional<Trip> trip = this.repository.findById(id);
+
+        if(trip.isPresent()){
+            Trip rawTrip = trip.get();
+
+            ParticipantCreateResponse participantResponse  = this.participantService.registerParticipantToEvent(payload.email(), rawTrip);
+
+            if(rawTrip.getIsConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(payload.email());
+            
+            return ResponseEntity.ok(participantResponse);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
 
 }
