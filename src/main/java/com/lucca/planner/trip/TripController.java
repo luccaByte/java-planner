@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lucca.planner.activity.ActivityData;
 import com.lucca.planner.activity.ActivityRequestPayload;
 import com.lucca.planner.activity.ActivityResponse;
 import com.lucca.planner.activity.ActivityService;
@@ -133,6 +134,13 @@ public class TripController {
         }
         return ResponseEntity.notFound().build();
 
+    }
+
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<List<ActivityData>> getAllActivities(@PathVariable UUID id) {
+        List<ActivityData> activityDataList = this.activityService.getAllActivitiesFromId(id);
+
+        return ResponseEntity.ok(activityDataList);
     }
 
 }
