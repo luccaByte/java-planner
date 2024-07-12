@@ -21,6 +21,9 @@ import com.lucca.planner.activity.ActivityData;
 import com.lucca.planner.activity.ActivityRequestPayload;
 import com.lucca.planner.activity.ActivityResponse;
 import com.lucca.planner.activity.ActivityService;
+import com.lucca.planner.link.LinkRequestPayload;
+import com.lucca.planner.link.LinkResponse;
+import com.lucca.planner.link.LinkService;
 import com.lucca.planner.participant.ParticipantCreateResponse;
 import com.lucca.planner.participant.ParticipantData;
 import com.lucca.planner.participant.ParticipantRequestPayload;
@@ -37,6 +40,9 @@ public class TripController {
     private ActivityService activityService;
 
     @Autowired
+    private LinkService linkService;
+
+    @Autowired
     private TripRepository repository;
 
     @PostMapping
@@ -49,6 +55,7 @@ public class TripController {
         return ResponseEntity.ok(new TripCreateResponse(newTrip.getId()));
     }
 
+    // TRIPS
     @GetMapping("/{id}")
     public ResponseEntity<Trip> getTripDetails(@PathVariable UUID id){
         Optional<Trip> trip = this.repository.findById(id);
@@ -95,6 +102,7 @@ public class TripController {
         return ResponseEntity.notFound().build();
     }
  
+    // ACTIVITY
     @PostMapping("/{id}/activities")
     public ResponseEntity<ActivityResponse> registerActivity(@PathVariable UUID id, @RequestBody ActivityRequestPayload payload) {
 
@@ -118,6 +126,7 @@ public class TripController {
         return ResponseEntity.ok(activityDataList);
     }
 
+    // PARTICIPANT
     @GetMapping("/{id}/participants")
     public ResponseEntity<List<ParticipantData>> getAllParticipants(@PathVariable UUID id) {
         List<ParticipantData> participantList = this.participantService.getAllParticipantsFromEvent(id);
@@ -140,6 +149,23 @@ public class TripController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    // LINKS
+    @PostMapping("/{id}/links")
+    public ResponseEntity<LinkResponse> registerLink(@PathVariable UUID id, @RequestBody LinkRequestPayload payload) {
+
+        Optional<Trip> trip = this.repository.findById(id);
+
+        if(trip.isPresent()){
+            Trip rawTrip = trip.get();
+
+            LinkResponse linkResponse = this.linkService.registerLink(payload, rawTrip);
+
+            return ResponseEntity.ok(linkResponse);
+        }
+        return ResponseEntity.notFound().build();
+
     }
 
 
