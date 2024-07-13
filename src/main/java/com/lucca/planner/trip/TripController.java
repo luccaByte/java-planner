@@ -21,6 +21,7 @@ import com.lucca.planner.activity.ActivityData;
 import com.lucca.planner.activity.ActivityRequestPayload;
 import com.lucca.planner.activity.ActivityResponse;
 import com.lucca.planner.activity.ActivityService;
+import com.lucca.planner.link.LinkData;
 import com.lucca.planner.link.LinkRequestPayload;
 import com.lucca.planner.link.LinkResponse;
 import com.lucca.planner.link.LinkService;
@@ -168,5 +169,12 @@ public class TripController {
 
     }
 
+
+    @GetMapping("/{id}/links")
+    public ResponseEntity<List<LinkData>> getAllLinks(@PathVariable UUID id) {
+        List<LinkData> linkDataList = this.linkService.getAllLinksFromTrip(id);
+
+        return ResponseEntity.ok(linkDataList);
+    }
 
 }
